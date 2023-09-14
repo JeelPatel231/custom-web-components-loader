@@ -1,0 +1,23 @@
+<template id="timeticker">
+  <h1 id="date-holder"></h1>
+</template>
+
+<script>
+  class TimeTicker extends HTMLElement {
+    constructor() {
+      super();
+      const shadow = this.attachShadow({mode: "open"})
+      shadow.appendChild(timeticker.content.cloneNode(true))
+      const dateHolder = shadow.getElementById("date-holder")
+
+      dateHolder.innerText = new Date()
+
+      setInterval((x) => {
+        dateHolder.innerText = new Date()
+      }, 1000)
+
+    }
+  }
+
+  customElements.define('time-ticker', TimeTicker)
+</script>
