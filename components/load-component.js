@@ -2,14 +2,6 @@
   Source : https://dev.to/dannyengelman/load-file-web-component-add-external-content-to-the-dom-1nd
 */
 
-function cloneScript(node) {
-  const newScript = document.createElement("script");
-  newScript.innerHTML = node.innerHTML;
-  node.replaceWith(newScript)
-}
-
-const ElementSet = new Set()
-
 customElements.define("load-component", class extends HTMLElement {
 
   async connectedCallback(
@@ -20,22 +12,15 @@ customElements.define("load-component", class extends HTMLElement {
       throw new Error("Source was null")
     }
     shadowRoot.innerHTML = await (await fetch(src)).text()
+    console.log(this.getAttribute("name"))
 
-    shadowRoot.append(...this.querySelectorAll("[shadowRoot]"))
+    const scriptTag = this.shadowRoot?.querySelector("script")
+    const templateTag = this.shadowRoot?.querySelector("template")
 
-    const allTemplates = this.shadowRoot?.querySelectorAll("template")
-    if (allTemplates != null) {
-      for (const template of allTemplates) {
-        if (ElementSet.has(template.id)) {
-          throw new Error("Conflicting Template IDs")
-        }
-        ElementSet.add(template.id)
-        document.body.appendChild(template)
-      }
-    }
+    const scriptExecutor = new Function('template', scriptTag.innerHTML);
+    const customElementConstructor = scriptExecutor(templateTag.content.cloneNode(true))
 
-    const allScripttags = this.shadowRoot?.querySelectorAll("script") ?? []
-    // clone scripts and remove them from template DOM
-    allScripttags.forEach((x) => cloneScript(x))
+    customElements.define(this.getAttribute("name"), customElementConstructor)
   }
+
 })
