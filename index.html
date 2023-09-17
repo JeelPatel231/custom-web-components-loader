@@ -6,11 +6,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Web Components</title>
   <script defer src="components/load-component.js"></script>
+  <load-component name="x-text" src="components/reactive-text.html"></load-component>
   <load-component name="time-ticker" src="components/timeticker.html"></load-component>
+  <load-component name="x-for" src="components/forlooper.html"></load-component>
 </head>
 
 <body>
   <time-ticker></time-ticker>
+  <ol>
+    <x-for data='[
+        {"name":"A","age":1},
+        {"name":"B","age":2},
+        {"name":"C","age":3},
+        {"name":"D","age":4},
+        {"name":"E","age":5}
+      ]'>
+      <template>
+        <li>
+          <x-text x-need-data var="name"></x-text>
+          is of age
+          <x-text x-need-data var="age"></x-text> <br />
+        </li>
+      </template>
+    </x-for>
+  </ol>
+
+  <button onclick="change()">change</button> <br>
+
+  <x-for x-need-data id="ch" data='[]'>
+    <template>
+      <x-text x-need-data></x-text> <br>
+    </template>
+  </x-for>
+
+
+  <script>
+    const el = document.getElementById("ch")
+    let counter = 0
+    function change() {
+      oldData = JSON.parse(el.getAttribute("data"))
+      oldData.push(counter++)
+      el.setAttribute("data", JSON.stringify(oldData))
+    }
+  </script>
+
+
+
 </body>
 
 </html>

@@ -1,0 +1,49 @@
+<script>
+
+  function accessProp(obj, propertyChain) {
+    return new Function('obj', `return obj.${propertyChain}`)(obj)
+  }
+
+  return class extends HTMLElement {
+    constructor(x) {
+      super()
+      const shadow = this.attachShadow({mode: "open"})
+      const forTemplate = this.firstElementChild;
+
+      if (forTemplate.nodeName !== "TEMPLATE") {
+        throw new Error("Root element of For node is not a template")
+      }
+
+      this.htmlTemplate = forTemplate;
+    }
+
+    static get observedAttributes() {
+      return ["data"]
+    }
+
+    cleanNode() {
+      while (this.shadowRoot?.firstElementChild) {
+        this.shadowRoot?.firstElementChild.remove()
+      }
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+      this.cleanNode()
+
+      const dataVar = this.getAttribute("data")
+      const propertyChain = this.getAttribute("var");
+      const innerData = propertyChain
+        ? accessProp(JSON.parse(newValue), propertyChain)
+        : JSON.parse(newValue)
+
+      innerData.forEach((item) => {
+        const attributeValue = (typeof item === "object") ? JSON.stringify(item) : item
+        const cloned = this.htmlTemplate.content.cloneNode(true)
+        cloned.querySelectorAll("[x-need-data]").forEach(a => {
+          a.setAttribute("data", attributeValue)
+        })
+        this.shadowRoot?.appendChild(cloned)
+      })
+    }
+  }
+</script>

@@ -18,7 +18,7 @@ customElements.define("load-component", class extends HTMLElement {
     const templateTag = this.shadowRoot?.querySelector("template")
 
     const scriptExecutor = new Function('template', scriptTag.innerHTML);
-    const customElementConstructor = scriptExecutor(templateTag.content.cloneNode(true))
+    const customElementConstructor = scriptExecutor(templateTag?.content?.cloneNode(true))
 
     customElements.define(this.getAttribute("name"), customElementConstructor)
   }

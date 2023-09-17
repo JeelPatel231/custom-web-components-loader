@@ -1,0 +1,24 @@
+<script>
+
+  function accessProp(obj, propertyChain) {
+    return new Function('obj', `return obj.${propertyChain}`)(obj)
+  }
+
+  return class extends HTMLElement {
+    constructor() {
+      super()
+    }
+
+    static get observedAttributes() {
+      return ["data"]
+    }
+
+
+    attributeChangedCallback(name, oldValue, newValue) {
+      const propertyChain = this.getAttribute("var");
+      this.innerText = propertyChain
+        ? accessProp(JSON.parse(newValue), propertyChain)
+        : newValue
+    }
+  }
+</script>
